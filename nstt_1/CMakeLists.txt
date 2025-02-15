@@ -3,4 +3,5 @@ project(tasks)
 
 set(CMAKE_CXX_STANDARD 11)
 
-add_executable(tasks main.cpp)
+add_executable(tasks SegmentTree.cpp
+        SegmentTreeTest.cpp)
