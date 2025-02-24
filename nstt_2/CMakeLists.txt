@@ -3,6 +3,4 @@ project(tasks)
 
 set(CMAKE_CXX_STANDARD 11)
 
-add_executable(tasks
-        Lines.cpp
-        LinesTest.cpp)
+add_executable(lines Lines.cpp LinesTest.cpp)

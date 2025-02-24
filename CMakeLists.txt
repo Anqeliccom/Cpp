@@ -3,4 +3,5 @@ project(tasks)
 
 set(CMAKE_CXX_STANDARD 11)
 
-add_executable(segment_tree SegmentTree.cpp SegmentTreeTest.cpp)
+add_subdirectory(nstt_1)
+add_subdirectory(nstt_2)
