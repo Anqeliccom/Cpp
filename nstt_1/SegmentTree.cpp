@@ -8,10 +8,11 @@ private:
         Node* left;
         Node* right;
 
-        Node() {
-            value = 0;
-            left = nullptr;
-            right = nullptr;
+        Node() : value(0), left(nullptr), right(nullptr) {}
+
+        Node(const Node& other) : value(other.value) {
+            left = other.left ? new Node(*other.left) : nullptr;
+            right = other.right ? new Node(*other.right) : nullptr;
         }
 
         ~Node() {
@@ -71,6 +72,21 @@ public:
         if (n != 0) {
             build(root, 0, n - 1, nums);
         }
+    }
+
+    SegmentTree(const SegmentTree& other) : n(other.n), root(nullptr) {
+        if (other.root) {
+            root = new Node(*other.root);
+        }
+    }
+
+    SegmentTree& operator=(const SegmentTree& other) {
+        if (this != &other) {
+            n = other.n;
+            delete root;
+            root = other.root ? new Node(*other.root) : nullptr;
+        }
+        return *this;
     }
 
     void update(size_t index, int val) {

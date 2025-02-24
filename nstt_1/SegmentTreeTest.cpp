@@ -1,9 +1,8 @@
-#include <iostream>
 #include <cassert>
 
 #include "SegmentTree.cpp"
 
-void runTests() {
+void runSumRangeAndUpdateTest() {
     SegmentTree arr({1, 3, 5, 7, 9});
     assert(arr.sumRange(2, 4) == 21);
     arr.update(3, 5);
@@ -17,12 +16,34 @@ void runTests() {
     SegmentTree emptyArr({});
     assert(emptyArr.sumRange(0, 0) == 0);
     emptyArr.update(0, 5);
+}
 
-    std::cout << "Tests passed" << std::endl;
+void runCopyConstructorTest() {
+    SegmentTree tree1({1, 3, 5, 7, 9});
+    SegmentTree tree2(tree1);
+
+    assert(tree2.sumRange(2, 4) == tree1.sumRange(2, 4));
+
+    tree2.update(3, 5);
+    assert(tree2.sumRange(2, 4) != tree1.sumRange(2, 4));
+}
+
+void runAssignmentOperatorTest() {
+    SegmentTree tree1({2, 4, 6, 8, 10});
+    SegmentTree tree2({1, 3, 5, 7, 9});
+
+    tree1.operator=(tree2);
+
+    assert(tree1.sumRange(2, 4) == tree2.sumRange(2, 4));
+
+    tree1.update(3, 5);
+    assert(tree1.sumRange(2, 4) != tree2.sumRange(2, 4));
 }
 
 int main() {
-    runTests();
+    runSumRangeAndUpdateTest();
+    runCopyConstructorTest();
+    runAssignmentOperatorTest();
+    std::cout << "Tests passed" << std::endl;
     return 0;
 }
-
