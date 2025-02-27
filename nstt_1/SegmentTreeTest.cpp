@@ -1,6 +1,7 @@
 #include <cassert>
 
-#include "SegmentTree.cpp"
+#include "SegmentTree.cpp" // PR: include source is always looks strange
+                           // lets convert SegmentTree to header file (just change .cpp to .hpp)
 
 void runSumRangeAndUpdateTest() {
     SegmentTree arr({1, 3, 5, 7, 9});
@@ -32,7 +33,7 @@ void runAssignmentOperatorTest() {
     SegmentTree tree1({2, 4, 6, 8, 10});
     SegmentTree tree2({1, 3, 5, 7, 9});
 
-    tree1.operator=(tree2);
+    tree1.operator=(tree2); // Note: You can write just tree1 = tree2
 
     assert(tree1.sumRange(2, 4) == tree2.sumRange(2, 4));
 

@@ -1,6 +1,41 @@
+#include <cassert>
 #include <iostream>
 #include <vector>
 
+/* PR: about dynamic SegmentTree
+ * --
+ * The general idea of segment tree - that we have a segment (ordered set without 'gaps')
+ * with some binary op with neutral element
+ * And then magic happens)
+ *
+ * Your implementation of SegmentTree is nice! And magic really happens in it)
+ * For ordinary SegmentTree it is enough to store just vector of values 
+ * (but Ivan suggest you to implement 'dynamic' SegmentTree).
+ * And you have all things (actually Nodes) to implement dynamic SegmentTree - so let's do that!
+ *
+ * --
+ * Idea of dynamic SegmentTree
+ * 
+ * Usually we have some small segment in tree. 
+ * By 'small' I mean that there is enough memory to allocate all nodes of your tree at once.
+ * Or maybe we don't care about memory usage ¯\_(ツ)_/¯
+ *
+ * But let's pretend that we care about memory, 
+ * and we need to analyse large segment (from 0 to C, where C is really large)
+ * 
+ * Looks like hard problem, so lets make one usefull assumption -
+ * - by default all values in segment is initialized by neutral element (in our case it is zero)
+ * 
+ * In this case we can update tree lazely (i.e. only when update called)
+ * Initially we create only root of the tree. Other nodes will be created only we need them 
+ * (i.e. when we go to the node in update and if it is empty then create new node)
+ *
+ * When we go to unexisted node in sum it means that its controlled segment is
+ * initialized by zeroes
+ *
+ * These changes are small, but powerfull!
+ * (and don't forget about tests on new functionallity)
+ */
 class SegmentTree {
 private:
     struct Node {
@@ -14,6 +49,11 @@ private:
             left = other.left ? new Node(*other.left) : nullptr;
             right = other.right ? new Node(*other.right) : nullptr;
         }
+        
+        /* Note: I guess it is okay not to have copy assigment operator
+         * in the private part of your code
+         * But I highly reccomend you to use the 'rule of three' everywhere 
+         */
 
         ~Node() {
             delete left;
@@ -79,6 +119,11 @@ public:
             root = new Node(*other.root);
         }
     }
+    
+    // PR: implement building implicit SegmentTree
+    SegmentTree(unsigned int C) {
+        assert(false);
+    }
 
     SegmentTree& operator=(const SegmentTree& other) {
         if (this != &other) {
@@ -89,6 +134,7 @@ public:
         return *this;
     }
 
+    // PR: let's add lazyness to update function
     void update(size_t index, int val) {
         if (!root) {
             std::cerr << "Error: update element in empty tree!" << std::endl;
@@ -100,6 +146,7 @@ public:
         updateRecursive(root, 0, n - 1, index, val);
     }
 
+    // PR: let's add lazyness to sumRange and sumRecursive
     int sumRange(size_t left, size_t right) {
         if (!root || left > right || right >= n) return 0;
         return sumRecursive(root, 0, n - 1, left, right);
