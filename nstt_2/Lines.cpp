@@ -1,14 +1,11 @@
 #include <cmath>
-#include <iostream>
+#include "Lines.hpp"
 
-struct Point {
-    double x, y;
+bool isEqual(double a, double b) {
+    return std::fabs(a - b) < EPS;
+}
 
-    Point(double x, double y) {
-        this->x = x;
-        this->y = y;
-    }
-};
+Point::Point(double x, double y) : x(x), y(y) {}
 
 /* PR: about encapsulation
  * This line representation is much complicated thing than the point
@@ -19,63 +16,61 @@ struct Point {
  * The same behavior will be in case of Line(p, p), where p - any point
  * See test samples
  */
-struct Line {
-    double a, b, c;
 
-    /* PR: constructor fix
-     * Let's try to fix this encapsulation issue
-     * I saw that you used exceptions in your code,
-     * but throwing exceptions in constructors 
-     * is a little bit tricky 
-     * (but possible and good way (if it is written right)) thing 
-     * 
-     * I suggest you to avoid them, try to use `std::optional`
-     * and some OOP 
-     * Note: if you can't come up with solution - feel free to text me
-     */
-    Line(const Point& p1, const Point& p2) {
-        a = p2.y - p1.y;
-        b = p1.x - p2.x;
-        c = p2.x * p1.y - p1.x * p2.y;
-    }
-    
-    /* PR: The same concern as above */ 
-    Line(double a, double b, double c) {
-        this->a = a;
-        this->b = b;
-        this->c = c;
-    }
+/* PR: constructor fix
+* Let's try to fix this encapsulation issue
+* I saw that you used exceptions in your code,
+* but throwing exceptions in constructors
+* is a little bit tricky
+* (but possible and good way (if it is written right)) thing
+*
+* I suggest you to avoid them, try to use `std::optional`
+* and some OOP
+* Note: if you can't come up with solution - feel free to text me
+*/
 
-    Point getIntersection(const Line& other) const {
-        double det = a * other.b - other.a * b;
+Line::Line(const Point& p1, const Point& p2) : a(p2.y - p1.y), b(p1.x - p2.x), c(p2.x * p1.y - p1.x * p2.y) {}
 
-        /* PR: floats are tricky
-         * comparing floating point numbers using '==' operator is almost always wrong
-         * For see that go to tests
-         *
-         * The usual way (and correct in some sence) to implement floats comparison 
-         * is creation of function that works in this way `a == b <=> |a - b| < eps`
-         * where eps is some precision of your computations
-         *
-         * Let's implement function that provides such functionallity.
-         * And then I suggest you to use implemented function to compare all floats in your code
-         *
-         * Note: if something is unclear - please write to me
-         */
-        if (det == 0) {
-            if (a * other.c == c * other.a && b * other.c == c * other.b) {
-                std::cerr << "The lines match." << std::endl;
-            } else {
-                std::cerr << "The lines ara parallel." << std::endl;
-            }
-            throw std::runtime_error("There are no intersections or infinitely many.");
-        }
-        double x = (b * other.c - other.b * c) / det;
-        double y = (other.a * c - a * other.c) / det;
-        return Point(x, y);
-    }
+Line::Line(double a, double b, double c) : a(a), b(b), c(c) {}
 
-    Line getPerpendicular(const Point& p) const {
-        return Line(b, -a, -b * p.x + a * p.y);
+std::optional<Line> Line::create(const Point& p1, const Point& p2) {
+    if (isEqual(p1.x, p2.x) && isEqual(p1.y, p2.y)) {
+        return std::nullopt;
     }
-};
+    return Line(p1, p2);
+}
+
+std::optional<Line> Line::create(double a, double b, double c) {
+    if (isEqual(a, 0) && isEqual(b, 0)) {
+        return std::nullopt;
+    }
+    return Line(a, b, c);
+}
+
+std::optional<Point> Line::getIntersection(const Line& other) const {
+    double det = a * other.b - other.a * b;
+
+    /* PR: floats are tricky
+    * comparing floating point numbers using '==' operator is almost always wrong
+    * For see that go to tests
+    *
+    * The usual way (and correct in some sence) to implement floats comparison
+    * is creation of function that works in this way `a == b <=> |a - b| < eps`
+    * where eps is some precision of your computations
+    *
+    * Let's implement function that provides such functionallity.
+    * And then I suggest you to use implemented function to compare all floats in your code
+    *
+    * Note: if something is unclear - please write to me
+    */
+    if (isEqual(det, 0)) {
+        return std::nullopt;
+    }
+    double x = (b * other.c - other.b * c) / det;
+    double y = (other.a * c - a * other.c) / det;
+    return Point(x, y);
+}
+
+Line Line::getPerpendicular(const Point& p) const {
+    return {b, -a, -b * p.x + a * p.y};
+}
