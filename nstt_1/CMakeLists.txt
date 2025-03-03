@@ -3,7 +3,8 @@ project(tasks)
 
 set(CMAKE_CXX_STANDARD 11)
 
-add_executable(segment_tree SegmentTree.cpp SegmentTreeTest.cpp)
+add_executable(segment_tree SegmentTree.cpp SegmentTreeTest.cpp
+        SegmentTree.hpp)
 
 option(ENABLE_SANITIZERS "Enable sanitizers for SegmentTree testing" OFF)
 
