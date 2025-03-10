@@ -20,9 +20,9 @@ public:
         return *this;
     }
 
-    ScopedPointerDeepCopy(ScopedPointerDeepCopy&&) = delete;
+    ScopedPointerDeepCopy(ScopedPointerDeepCopy&& other) = delete;
 
-    ScopedPointerDeepCopy& operator=(ScopedPointerDeepCopy&&) = delete;
+    ScopedPointerDeepCopy& operator=(ScopedPointerDeepCopy&& other) = delete;
 
     T& get() { return *pointer; }
     const T& get() const { return *pointer; }
@@ -42,8 +42,8 @@ class ScopedPointerMove {
 public:
     explicit ScopedPointerMove(T* raw) : pointer(raw) {}
 
-    ScopedPointerMove(const ScopedPointerMove&) = delete;
-    ScopedPointerMove& operator=(const ScopedPointerMove&) = delete;
+    ScopedPointerMove(const ScopedPointerMove& other) = delete;
+    ScopedPointerMove& operator=(const ScopedPointerMove& other) = delete;
 
     ScopedPointerMove(ScopedPointerMove&& other) noexcept : pointer(other.pointer) {
         other.pointer = nullptr;
