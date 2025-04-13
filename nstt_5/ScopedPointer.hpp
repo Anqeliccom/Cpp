@@ -24,8 +24,8 @@ public:
 
     ScopedPointerDeepCopy& operator=(ScopedPointerDeepCopy&& other) = delete;
 
-    T& get() { return *pointer; }
-    const T& get() const { return *pointer; }
+    T& operator*() { return *pointer; }
+    const T& operator*() const { return *pointer; }
 
     T* operator->() { return pointer; }
     const T* operator->() const { return pointer; }
@@ -58,8 +58,8 @@ public:
         return *this;
     }
 
-    T& get() { return *pointer; }
-    const T& get() const { return *pointer; }
+    T& operator*() { return *pointer; }
+    const T& operator*() const { return *pointer; }
 
     T* operator->() { return pointer; }
     const T* operator->() const { return pointer; }

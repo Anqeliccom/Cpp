@@ -12,8 +12,6 @@ Matrix::Matrix(const std::vector<double>& vector)
         : size(vector.size()), data(new double*[size]) {
     for (size_t i = 0; i < size; ++i) {
         data[i] = new double[size]();
-    }
-    for (size_t i = 0; i < size; ++i) {
         data[i][i] = vector[i];
     }
 }
@@ -145,11 +143,18 @@ bool Matrix::operator!=(const Matrix& other) const {
     return !(*this == other);
 }
 
-double* Matrix::operator[](size_t index) {
+Matrix::Row Matrix::operator[](size_t index) {
     if (index >= size) {
-        throw std::out_of_range("Index out of range");
+        throw std::out_of_range("Row index out of range");
     }
-    return data[index];
+    return Row(data[index], size);
+}
+
+double& Matrix::Row::operator[](size_t index) {
+    if (index >= row_size) {
+        throw std::out_of_range("Column index out of range");
+    }
+    return row_data[index];
 }
 
 void Matrix::print() const {
@@ -164,3 +169,4 @@ void Matrix::print() const {
 size_t Matrix::getSize() const {
     return size;
 }
+

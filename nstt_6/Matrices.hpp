@@ -9,6 +9,14 @@ private:
     size_t size;
     double** data;
 
+    class Row {
+        size_t row_size;
+        double* row_data;
+    public:
+        Row(double* data, size_t size) : row_data(data), row_size(size) {}
+        double& operator[](size_t index);
+    };
+
 public:
     explicit Matrix(size_t n);
     explicit Matrix(const std::vector<double>& vector);
@@ -27,7 +35,7 @@ public:
     bool operator==(const Matrix& other) const;
     bool operator!=(const Matrix& other) const;
 
-    double* operator[](size_t index);
+    Row operator[](size_t index);
 
     void print() const;
     size_t getSize() const;
