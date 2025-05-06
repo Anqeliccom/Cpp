@@ -27,27 +27,33 @@ void ScopedPointerMoveTest() {
     assert(p2.operator->() == nullptr);
 }
 
-void DrillDownDeepCopyTest() {
-    int *x =  new int(10);
-    ScopedPointerDeepCopy<int> px(x);
-    ScopedPointerDeepCopy<int> ppx(px);
-    assert(*ppx == 10);
-    assert(ppx.operator->() != x);
-}
+struct C {
+    int value;
+    C(int v) : value(v) {}
+};
 
-void DrillDownMoveTest() {
-    int* x = new int(10);
-    ScopedPointerMove<int> px(x);
-    ScopedPointerMove<int> ppx(std::move(px));
-    assert(*ppx == 10);
-    assert(ppx.operator->() == x);
+struct B {
+    ScopedPointerDeepCopy<C> c;
+    B(int v) : c(new C(v)) {}
+};
+
+struct A {
+    ScopedPointerDeepCopy<B> b;
+    A(int v) : b(new B(v)) {}
+};
+
+void DrillDownTest() {
+    ScopedPointerDeepCopy<A> pa(new A(12));
+    int v1 = pa.operator->()->b.operator->()->c.operator->()->value;
+    int v2 = pa->b->c->value;
+    assert(v1 == v2);
+    assert(v2 == 12);
 }
 
 int main() {
     ScopedPointerDeepCopyTest();
     ScopedPointerMoveTest();
-    DrillDownDeepCopyTest();
-    DrillDownMoveTest();
+    DrillDownTest();
     std::cout << "Tests passed" << std::endl;
     return 0;
 }
