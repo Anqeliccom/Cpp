@@ -34,6 +34,15 @@ template <typename Derived, int limit>
 class LimitedInstance : Counter<Derived> {
 public:
     LimitedInstance() {
+        check_limit();
+    }
+
+    LimitedInstance(const LimitedInstance&) {
+        check_limit();
+    }
+
+private:
+    void check_limit() {
         if (Counter<Derived>::objects_alive > limit) {
             throw std::runtime_error("Limit of instances exceeded");
         }
