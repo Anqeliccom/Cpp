@@ -3,6 +3,28 @@
 #include <iostream>
 #include "SegmentTree.hpp"
 
+struct Mod5 {
+    int m;
+
+    Mod5() : m(0) {}
+    Mod5(int val) : m(val % 5) {}
+
+    Mod5 operator+(const Mod5& other) const {
+        return Mod5(m + other.m);
+    }
+
+    bool operator==(const Mod5& other) const {
+        return m == other.m;
+    }
+};
+
+template<>
+struct Defaulter<Mod5> {
+    Mod5 operator()() const {
+        return Mod5(0);
+    }
+};
+
 template <typename T>
 void runDynamicSumRangeAndUpdateTest() {
     SegmentTree<T> tree(10);
@@ -83,6 +105,34 @@ void runDynamicMoveAssignmentOperatorTest() {
     assert(tree1.sumRange(2, 2) == T(0));
 }
 
+void runMod5Test() {
+    std::cout << "\n//// Mod5 Test ////" << std::endl;
+    SegmentTree<Mod5> tree(10);
+
+    tree.update(2, Mod5(7));
+    assert(tree.sumRange(0, 9) == Mod5(2));
+
+    tree.update(5, Mod5(8));
+    assert(tree.sumRange(0, 9) == Mod5(0));
+    assert(tree.sumRange(0, 4) == Mod5(2));
+    assert(tree.sumRange(5, 9) == Mod5(3));
+}
+
+void runProductTest() {
+    std::cout << "\n//// Product Test ////" << std::endl;
+    SegmentTree<Product<int>> tree(10);
+
+    assert(tree.sumRange(0, 9).val == 1);
+
+    tree.update(2, Product<int>(5));
+    assert(tree.sumRange(0, 9).val == 5);
+
+    tree.update(5, Product<int>(3));
+    assert(tree.sumRange(0, 9).val == 15);
+    assert(tree.sumRange(0, 4).val == 5);
+    assert(tree.sumRange(5, 9).val == 3);
+}
+
 int main() {
     std::cout << "TESTS FOR INT" << std::endl;
     runDynamicSumRangeAndUpdateTest<int>();
@@ -98,7 +148,8 @@ int main() {
     runDynamicMoveConstructorTest<double>();
     runDynamicMoveAssignmentOperatorTest<double>();
 
+    runProductTest();
+    runMod5Test();
     std::cout << "Tests passed" << std::endl;
     return 0;
 }
-

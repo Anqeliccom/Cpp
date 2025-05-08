@@ -3,7 +3,42 @@
 
 #include <iostream>
 
-template <typename T, T default_value = T()>
+template<typename T>
+struct Defaulter {
+    T operator()() const {
+        return T();
+    }
+};
+
+template<typename T>
+struct Operation {
+    T operator()(const T& l, const T& r) const {
+        return l + r;
+    }
+};
+
+template<typename T>
+struct Product {
+    T val;
+    Product() : val(1) {}
+    Product(T v) : val(v) {}
+};
+
+template<typename T>
+struct Defaulter<Product<T>> {
+    Product<T> operator()() const {
+        return Product<T>(1);
+    }
+};
+
+template<typename T>
+struct Operation<Product<T>> {
+    Product<T> operator()(const Product<T>& l, const Product<T>& r) const {
+        return Product<T>(l.val * r.val);
+    }
+};
+
+template <typename T, typename F = Operation<T>, typename D = Defaulter<T>>
 class SegmentTree {
 private:
     struct Node {
@@ -11,7 +46,7 @@ private:
         Node* left;
         Node* right;
 
-        Node() : value(default_value), left(nullptr), right(nullptr) {}
+        Node(const D& defaulter) : value(defaulter()), left(nullptr), right(nullptr) {}
         Node(const Node& other) : value(other.value) {
             left = other.left ? new Node(*other.left) : nullptr;
             right = other.right ? new Node(*other.right) : nullptr;
@@ -34,9 +69,11 @@ private:
 
     Node* root;
     size_t n;
+    F op;
+    D default_value;
 
     void updateRecursive(Node*& node, size_t tl, size_t tr, size_t index, T val) {
-        if (!node) node = new Node();
+        if (!node) node = new Node(default_value);
 
         if (tl == tr) {
             node->value = val;
@@ -48,32 +85,32 @@ private:
             } else {
                 updateRecursive(node->right, tm + 1, tr, index, val);
             }
-            node->value = (node->left ? node->left->value : default_value) +
-                          (node->right ? node->right->value : default_value);
+            node->value = op(node->left ? node->left->value : default_value(),
+                             node->right ? node->right->value : default_value());
         }
     }
 
     T sumRecursive(Node* node, size_t tl, size_t tr, size_t left, size_t right) {
-        if (!node) return default_value;
+        if (!node) return default_value();
 
         if (left == tl && right == tr) return node->value;
         size_t tm = (tl + tr) >> 1;
-        T res = default_value;
+        T res = default_value();
         if (left <= tm) {
-            res += sumRecursive(node->left, tl, tm, left, std::min(right, tm));
+            res = op(res, sumRecursive(node->left, tl, tm, left, std::min(right, tm)));
         }
         if (right >= tm + 1) {
-            res += sumRecursive(node->right, tm + 1, tr, std::max(left, tm + 1), right);
+            res = op(res, sumRecursive(node->right, tm + 1, tr, std::max(left, tm + 1), right));
         }
         return res;
     }
 
 public:
-    explicit SegmentTree(unsigned int C) : root(nullptr), n(C) {
+    explicit SegmentTree(unsigned int C) : root(nullptr), n(C), op(F()), default_value(D()) {
         std::cout << "SegmentTree created" << std::endl;
     }
 
-    SegmentTree(const SegmentTree& other) : n(other.n), root(nullptr) {
+    SegmentTree(const SegmentTree& other) : n(other.n), op(other.op), default_value(other.default_value), root(nullptr) {
         if (other.root) {
             root = new Node(*other.root);
         }
@@ -83,6 +120,8 @@ public:
     SegmentTree& operator=(const SegmentTree& other) {
         if (this != &other) {
             n = other.n;
+            op = other.op;
+            default_value = other.default_value;
             delete root;
             root = other.root ? new Node(*other.root) : nullptr;
         }
@@ -90,7 +129,7 @@ public:
         return *this;
     }
 
-    SegmentTree(SegmentTree&& other) noexcept : n(other.n), root(other.root) {
+    SegmentTree(SegmentTree&& other) noexcept : n(other.n), root(other.root), op(other.op), default_value(other.default_value) {
         other.root = nullptr;
         std::cout << "SegmentTree moved" << std::endl;
     }
@@ -98,6 +137,8 @@ public:
     SegmentTree& operator=(SegmentTree&& other) noexcept {
         if (this != &other) {
             n = other.n;
+            op = other.op;
+            default_value = other.default_value;
             delete root;
             root = other.root;
             other.root = nullptr;
@@ -111,7 +152,7 @@ public:
     }
 
     T sumRange(size_t left, size_t right) {
-        if (!root || left > right || right >= n) return default_value;
+        if (!root || left > right || right >= n) return default_value();
         return sumRecursive(root, 0, n - 1, left, right);
     }
 
