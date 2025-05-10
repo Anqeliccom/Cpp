@@ -61,7 +61,7 @@ private:
 
         if (tl == tr) {
             node->value = val;
-            return node;
+            return std::move(node);
         } else {
             size_t tm = (tl + tr) >> 1;
             if (index <= tm) {
@@ -71,7 +71,7 @@ private:
             }
             node->value = op(node->left ? node->left->value : default_value(),
                              node->right ? node->right->value : default_value());
-            return node;
+            return std::move(node);
         }
     }
 
@@ -97,7 +97,7 @@ private:
             if (tl < vector.size()) {
                 node->value = vector[tl];
             }
-            return node;
+            return std::move(node);
         }
 
         size_t tm = (tl + tr) >> 1;
@@ -108,7 +108,7 @@ private:
                 node->left ? node->left->value : default_value(),
                 node->right ? node->right->value : default_value()
         );
-        return node;
+        return std::move(node);
     }
 
 public:
