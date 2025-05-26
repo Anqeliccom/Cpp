@@ -1,5 +1,6 @@
 #include <memory>
 #include <cassert>
+#include <iostream>
 
 template<typename T>
 constexpr size_t align_up(size_t offset) {
@@ -45,6 +46,12 @@ public:
     T getElement(size_t idx) {
         return *(T*)(data + offsets[idx]);
     }
+
+    ~Container(){
+        int cout = 0;
+        ((*((Types*)(data + offsets[cout]))).~Types(), ...);
+        std::cout << "delete" << std::endl;
+    }
 };
 
 struct Point { int x, y; };
@@ -54,5 +61,6 @@ int main() {
     assert(c.getElement<int>(0) == 12);
     assert(c.getElement<char>(1) == 'c');
     assert(c.getElement<Point>(2).x == 2);
+    std::cout << "end" << std::endl;
     return 0;
 }
