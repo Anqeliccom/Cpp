@@ -49,7 +49,7 @@ public:
 
     ~Container(){
         int cout = 0;
-        ((*((Types*)(data + offsets[cout]))).~Types(), ...);
+        ((*((Types*)(data + offsets[cout++]))).~Types(), ...);
         std::cout << "delete" << std::endl;
     }
 };
